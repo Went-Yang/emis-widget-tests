@@ -24,10 +24,9 @@ This GitHub repository is to test 3 ServiceNow-based widgets developed by us tha
     pip install selenium
     ```
 
-5. Run tests
+5. Run tests, for example
 
     ```cmd
-    # for example
     python test_fav_btn.py
     ```
 
