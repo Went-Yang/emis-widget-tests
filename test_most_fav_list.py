@@ -4,18 +4,20 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 
+# This is to test "Most Favourite Articles" widget
 class MyTestCase(unittest.TestCase):
 
     dr = None
 
     @classmethod
     def setUpClass(cls):
-        # enable headless mode
+        # use chrome to test
         chrome_options = webdriver.ChromeOptions()
-        # chrome_options.add_argument('--no-sandbox')
-        # chrome_options.add_argument('--headless')
-        # chrome_options.add_argument('--disable-gpu')
+        # enable headless mode
+        chrome_options.add_argument('--headless')
+        # set options
         cls.dr = webdriver.Chrome(options=chrome_options)
+        # set the implicit wait time
         cls.dr.implicitly_wait(5)
 
         # define article id and user id
@@ -38,10 +40,12 @@ class MyTestCase(unittest.TestCase):
         cls.dr.find_element_by_name('login').click()
 
     def setUp(self):
+        print('start adding dummy records')
         self.visit_fav_table()
         self.add_fav_record(self.articles, '111')
         self.add_fav_record(self.articles[0:2], '222')
         self.add_fav_record(self.articles[0:1], '333')
+        print('finish adding dummy records')
 
     def visit_fav_table(self):
         if self.dr.current_url != self.table_url:
@@ -106,21 +110,27 @@ class MyTestCase(unittest.TestCase):
             self.assertFalse(found, 'still found')
 
     def test_1_check_list(self):
+        print('start testing showing most favourites')
         self.check_list(self.articles)
+        print('test passed')
 
     def test_2_add_and_del_fav_article(self):
+        print('start testing showing most favourites after adding and removing')
         l = self.articles + self.a
         self.visit_and_add_fav_record(l, '444')
         self.check_list(l)
         self.visit_and_del_fav_record(l, '444')
         self.check_list(self.articles)
         self.check_no_articles(self.a)
+        print('test passed')
 
     def tearDown(self):
+        print('start removing dummy records')
         self.visit_fav_table()
         self.del_fav_record(self.articles, '111')
         self.del_fav_record(self.articles[0:2], '222')
         self.del_fav_record(self.articles[0:1], '333')
+        print('finish removing dummy records')
 
     @classmethod
     def tearDownClass(cls):
