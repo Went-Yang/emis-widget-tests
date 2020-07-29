@@ -1,6 +1,6 @@
 # emis-widget-tests
 
-This GitHub repository is to test 3 ServiceNow-based widgets developed by us that are related to the favorites feature. Since the automated testing framework provided by ServiceNow does not support automated testing of service portal widgets, a third-party testing framework, Selenium, was used to perform unit testing to validate the widgets we had created.
+This GitHub repository is to test 3 ServiceNow-based widgets developed by us that are related to the favorites feature. Since the automated testing framework provided by ServiceNow does not support automated testing of service portal widgets, a third-party testing framework, Selenium, was used to perform unit testing to validate the widgets we had created. Due to the difficulty of integrating unit testing frameworks into ServiceNow, these tests are performed by examining page elements and simulating users' input and clicking.
 
 **Requirements:**
 
