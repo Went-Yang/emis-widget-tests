@@ -1,0 +1,33 @@
+sudo: required
+dist: trusty
+language: python
+python:
+  - "3.6"
+
+addons:
+  chrome: stable
+
+install:
+  - pip install selenium
+
+before_script:
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  - export CHROME_BIN=/usr/bin/google-chrome
+  - sudo apt-get clean
+  - sudo apt-get update
+  - sudo apt-get install dpkg
+  - sudo apt-get install -y libappindicator1 fonts-liberation
+  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  - sudo dpkg -i google-chrome*.deb
+  - wget https://chromedriver.storage.googleapis.com/84.0.4147.30/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip
+  - sudo cp chromedriver /usr/bin
+
+script:
+    - python test_fav_btn.py
+    - python test_my_fav_list.py
+    - python test_most_fav_list.py
+
+after_script:
+  - "sh -e /etc/init.d/xvfb stop"
