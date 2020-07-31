@@ -4,6 +4,40 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, UnexpectedAlertPresentException, TimeoutException
 
 
+# visit the favourite record table
+def visit_table(dr, retry_time):
+    url = 'https://dev67438.service-now.com/nav_to.do?uri=%2Fx_512628_webwidget_favourite_records_list.do'
+    if dr.current_url != url:
+        # retry
+        for _ in range(retry_time):
+            try:
+                dr.get(url)
+                sleep(3)
+                dr.switch_to.frame("gsft_main")
+                break
+            except (UnexpectedAlertPresentException, TimeoutException):
+                continue
+
+
+# delete all the records
+def del_all_record(dr, retry_time):
+    for _ in range(retry_time):
+        try:
+            url = 'https://dev67438.service-now.com/nav_to.do?uri=%2Fsys_db_object.do%3Fsys_id%3D385e11941b0e501064244375cc4bcb0c%26sysparm_record_target%3Dsys_db_object%26sysparm_record_row%3D1%26sysparm_record_rows%3D2430%26sysparm_record_list%3Dsys_update_nameISNOTEMPTY%5Elabel%3E%3Dfavourite%5EORDERBYlabel'
+            dr.get(url)
+            sleep(3)
+            dr.switch_to.frame('gsft_main')
+            dr.find_element_by_id('delete_all_records').click()
+            sleep(1)
+            dr.switch_to.alert.send_keys('delete')
+            dr.switch_to.alert.accept()
+            sleep(2)
+            dr.switch_to.alert.accept()
+            break
+        except:
+            continue
+
+
 # This is to test the "Favourite" and "Unfavourite" buttons
 class FavBtnTests(unittest.TestCase):
 
@@ -45,46 +79,14 @@ class FavBtnTests(unittest.TestCase):
             except:
                 continue
 
-    # delete all the records
-    def del_all_record(self):
-        for _ in range(self.retry_time):
-            try:
-                url = 'https://dev67438.service-now.com/nav_to.do?uri=%2Fsys_db_object.do%3Fsys_id%3D385e11941b0e501064244375cc4bcb0c%26sysparm_record_target%3Dsys_db_object%26sysparm_record_row%3D1%26sysparm_record_rows%3D2430%26sysparm_record_list%3Dsys_update_nameISNOTEMPTY%5Elabel%3E%3Dfavourite%5EORDERBYlabel'
-                self.dr.get(url)
-                sleep(3)
-                self.dr.switch_to.frame('gsft_main')
-                self.dr.find_element_by_id('delete_all_records').click()
-                sleep(1)
-                self.dr.switch_to.alert.send_keys('delete')
-                self.dr.switch_to.alert.accept()
-                sleep(2)
-                self.dr.switch_to.alert.accept()
-                break
-            except:
-                continue
-
     def setUp(self):
-        self.del_all_record()
+        del_all_record(self.dr, self.retry_time)
 
     # visit the article page
     def visit_article(self):
         if self.dr.current_url != self.article_url:
             self.dr.get(self.article_url)
             sleep(3)
-
-    # visit the favourite record table
-    def visit_table(self):
-        url = 'https://dev67438.service-now.com/nav_to.do?uri=%2Fx_512628_webwidget_favourite_records_list.do'
-        if self.dr.current_url != url:
-            # retry
-            for _ in range(self.retry_time):
-                try:
-                    self.dr.get(url)
-                    sleep(3)
-                    self.dr.switch_to.frame("gsft_main")
-                    break
-                except (UnexpectedAlertPresentException, TimeoutException):
-                    continue
 
     # test marking an article as favourite
     def test_1_add_fav(self):
@@ -96,7 +98,7 @@ class FavBtnTests(unittest.TestCase):
 
         # visit table to check records
         # if not found, it will throw an exception
-        self.visit_table()
+        visit_table(self.dr, self.retry_time)
         self.dr.find_element_by_xpath("//tr[td/a/text()='{}' and td/text()='{}']".format(self.article, self.user))
 
     # test removing an favourite article
@@ -109,7 +111,7 @@ class FavBtnTests(unittest.TestCase):
 
         # visit table to check records
         # if not found, it will throw an exception
-        self.visit_table()
+        visit_table(self.dr, self.retry_time)
         self.dr.find_element_by_xpath("//tr[td/a/text()='{}' and td/text()='{}']".format(self.article, self.user))
 
         # click the unfavourite button
@@ -118,7 +120,7 @@ class FavBtnTests(unittest.TestCase):
 
         # visit table to check records
         # not found will throw exception, which is expected
-        self.visit_table()
+        visit_table(self.dr, self.retry_time)
         raised = False
         try:
             self.dr.find_element_by_xpath("//tr[td/a/text()='{}' and td/text()='{}']".format(self.article, self.user))
@@ -127,7 +129,7 @@ class FavBtnTests(unittest.TestCase):
         self.assertTrue(raised, "the record still exists")
 
     def tearDown(self):
-        self.del_all_record()
+        del_all_record(self.dr, self.retry_time)
 
     # quit driver
     @classmethod
